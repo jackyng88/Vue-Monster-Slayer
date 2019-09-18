@@ -4,7 +4,8 @@ var app = new Vue ({
     data: {
         playerHealth: 100,
         monsterHealth: 100,
-        gameIsRunning: false
+        gameIsRunning: false,
+        turns: []
     },
 
     methods: {
@@ -12,9 +13,15 @@ var app = new Vue ({
             this.gameIsRunning = true;
             this.playerHealth = 100;
             this.monsterHealth = 100;
+            this.turns = [];
         },
         attack: function() {
-            this.monsterHealth -= this.calculateDamage(3, 10);
+            var damage = this.calculateDamage(3, 10);
+            this.monsterHealth -= damage;
+            this.turns.unshift({
+                isPlayer: true,
+                text: 'Player dealt ' + damage + ' damage!'
+            });
             if (this.checkWin()) {
                 return;
             }
@@ -22,11 +29,22 @@ var app = new Vue ({
             this.monsterAttack();
         },
         monsterAttack: function() {
-            this.playerHealth -= this.calculateDamage(5, 12);
+            var damage = this.calculateDamage(5, 12);
+            this.playerHealth -= damage
             this.checkWin();
+
+            this.turns.unshift({
+                isPlayer: false,
+                text: 'Monster dealt ' + damage + ' damage!'
+            });
         },
         specialAttack: function() {
-            this.monsterHealth -= this.calculateDamage(10, 20);
+            var damage = this.calculateDamage(10, 20);
+            this.monsterHealth -= damage;
+            this.turns.unshift({
+                isPlayer: true,
+                text: 'Player dealt a critical for ' + damage + ' damage!'
+            });
             if (this.checkWin()) {
                 return;
             }
@@ -39,6 +57,10 @@ var app = new Vue ({
             else {
                 this.playerHealth = 100;
             }
+            this.turns.unshift({
+                isPlayer: true,
+                text: 'Player healed 10 damage!'
+            });
             this.monsterAttack();
         },
         giveUp: function() {
